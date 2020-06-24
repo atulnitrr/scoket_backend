@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const socket = io("http://localhost:3031");
+      socket.on("connect", (data) => {
+        socket.on("fromServer", (msg) => {
+          console.log(JSON.stringify(msg));
+        });
+
+        socket.emit("fromClient", { data: "hello from client web browser" });
+        console.log(data);
+      });
+    </script>
+  </body>
+</html>

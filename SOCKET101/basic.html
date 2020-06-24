@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // let wc = new WebSocket("ws://loclahost:3031");
+      const socket = io("http://localhost:3031");
+      console.log(socket);
+      socket.on("connect", (data) => {
+        socket.on("welcome", (message) => {
+          console.log(message);
+        });
+
+        socket.emit("message", { data: "Hello from client " });
+      });
+    </script>
+  </body>
+</html>

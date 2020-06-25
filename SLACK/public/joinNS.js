@@ -1,5 +1,5 @@
-function joinNs(endpoint) {
-  const nsSocket = io(`http://localhost:3033${endpoint}`);
+function joinNS(endpoint) {
+  nsSocket = io(`http://localhost:3033${endpoint}`);
 
   nsSocket.on("nsRoomLoad", (nsRooms) => {
     let roomList = document.querySelector(".room-list");
@@ -12,15 +12,22 @@ function joinNs(endpoint) {
 
     //room nodes
     let roomNodes = document.getElementsByClassName("room");
-    console.log(roomNodes);
     Array.from(roomNodes).forEach((elem) => {
       elem.addEventListener("click", (e) => {
-        console.log("ffff");
+        console.log(e.target.innerText);
       });
     });
+
+    //
+    let topRoom = document.querySelector(".room");
+    const topRoomName = topRoom.innerText;
+    joinRoom(topRoomName);
+
+    //
   });
 
   nsSocket.on("messageToClients", (msg) => {
+    console.log(msg);
     document.querySelector("#messages").innerHTML += `<li>${msg.text}</li>`;
   });
 
@@ -33,4 +40,20 @@ function joinNs(endpoint) {
       nsSocket.emit("newMsgToServer", { text: newMessage });
       msgNode.value = "";
     });
+
+  //
+}
+
+function buildHtml(fullMsg) {
+  const newHtml = `<li>
+  <div class="user-image">
+    <img src="https://via.placeholder.com/30" />
+  </div>
+  <div class="user-message">
+    <div class="user-name-time">rbunch <span>1:25 pm</span></div>
+    <div class="message-text">I went running today.</div>
+  </div>
+</li>`;
+
+  return newHtml;
 }

@@ -1,4 +1,5 @@
 const socket = io("http://localhost:3033");
+let nsSocket = "";
 
 socket.on("nsList", (nsData) => {
   let namespacesDiv = document.querySelector(".namespaces");
@@ -14,5 +15,5 @@ socket.on("nsList", (nsData) => {
     });
   });
 
-  joinNs("/wiki");
+  joinNS("/wiki");
 });

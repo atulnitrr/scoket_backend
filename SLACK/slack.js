@@ -26,7 +26,29 @@ io.on("connection", (socket) => {
 namespaces.forEach((namespace) => {
   io.of(namespace.endpoint).on("connection", (nsSocket) => {
     console.log(`${nsSocket.id} has joined ${namespace.endpoint}`);
-
     nsSocket.emit("nsRoomLoad", namespaces[0].rooms);
+    // JOIN ROOM
+    nsSocket.on("joinRoom", (roomToJoin, callBack) => {
+      nsSocket.join(roomToJoin);
+      io.of("/wiki")
+        .in(roomToJoin)
+        .clients((error, clients) => {
+          callBack(clients.length);
+        });
+    });
+    //
+
+    nsSocket.on("newMsgToServer", (msg) => {
+      const fullMsg = {
+        text: msg,
+        time: Date.now(),
+        username: "Atul",
+        avatar: "https://via.placeholder.com/30",
+      };
+      const roomTitles = Object.keys(nsSocket.rooms);
+      const roomTitle = roomTitles[1];
+      io.of("/wiki").to(roomTitle).emit("messageToClients", fullMsg);
+    });
+    //
   });
 });

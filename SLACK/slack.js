@@ -1,7 +1,9 @@
 const express = require("express");
+const expressApp = express();
 const socketio = require("socket.io");
 
-const expressApp = express();
+let namespaces = require("./data/namespaces");
+console.log(namespaces);
 
 expressApp.use(express.static(__dirname + "/public"));
 

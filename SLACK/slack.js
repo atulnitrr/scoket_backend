@@ -1,9 +1,7 @@
 const express = require("express");
 const expressApp = express();
 const socketio = require("socket.io");
-
 let namespaces = require("./data/namespaces");
-console.log(namespaces);
 
 expressApp.use(express.static(__dirname + "/public"));
 
@@ -14,18 +12,19 @@ const expressServer = expressApp.listen("3033", () => {
 const io = socketio(expressServer);
 
 io.on("connection", (socket) => {
-  socket.on("msgToServer", (dataFromClient) => {
-    console.log(JSON.stringify(dataFromClient));
+  let nsData = namespaces.map((ns) => {
+    return {
+      img: ns.img,
+      endpoint: ns.endpoint,
+    };
   });
-  socket.emit("msgFromServer", { data: "hello from server data" });
 
-  socket.join("level1");
-  socket
-    .to("level1")
-    .emit("joined", `${socket.id} says I have joined the room`);
+  // just give all name space to the calling client not all the client
+  socket.emit("nsList", nsData);
 });
 
-io.of("/admin").on("connection", (socket) => {
-  console.log("connecteted to admin");
-  io.of("/admin").emit("welcome", "Welcome from admin name space ");
+namespaces.forEach((namespace) => {
+  io.of(namespace.endpoint).on("connection", (socket) => {
+    console.log(`${socket.id} has joined ${namespace.endpoint}`);
+  });
 });

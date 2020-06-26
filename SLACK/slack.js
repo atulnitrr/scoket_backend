@@ -30,11 +30,22 @@ namespaces.forEach((namespace) => {
     // JOIN ROOM
     nsSocket.on("joinRoom", (roomToJoin, callBack) => {
       nsSocket.join(roomToJoin);
+      // io.of("/wiki")
+      //   .in(roomToJoin)
+      //   .clients((error, clients) => {
+      //     callBack(clients.length);
+      //   });
+      //
+      const nsRoom = namespaces[0].rooms.find((room) => {
+        return room.roomTitle === roomToJoin;
+      });
+      nsSocket.emit("histroyCatchUp", nsRoom.history);
       io.of("/wiki")
-        .in(roomToJoin)
+        .to(roomToJoin)
         .clients((error, clients) => {
-          callBack(clients.length);
+          io.of("/wiki").to(roomToJoin).emit("updateMembers", clients.length);
         });
+      //
     });
     //
 
@@ -47,6 +58,12 @@ namespaces.forEach((namespace) => {
       };
       const roomTitles = Object.keys(nsSocket.rooms);
       const roomTitle = roomTitles[1];
+      const nsRoom = namespaces[0].rooms.find((room) => {
+        return room.roomTitle === roomTitle;
+      });
+
+      console.log(nsRoom);
+      nsRoom.addMessage(fullMsg);
       io.of("/wiki").to(roomTitle).emit("messageToClients", fullMsg);
     });
     //

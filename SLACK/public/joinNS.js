@@ -28,7 +28,8 @@ function joinNS(endpoint) {
 
   nsSocket.on("messageToClients", (msg) => {
     console.log(msg);
-    document.querySelector("#messages").innerHTML += `<li>${msg.text}</li>`;
+    const msgELement = buildHtml(msg);
+    document.querySelector("#messages").innerHTML += msgELement;
   });
 
   document
@@ -44,14 +45,18 @@ function joinNS(endpoint) {
   //
 }
 
-function buildHtml(fullMsg) {
+function buildHtml(msg) {
+  const date = new Date(msg.time);
   const newHtml = `<li>
+
   <div class="user-image">
-    <img src="https://via.placeholder.com/30" />
+    <img src=${msg.avatar} />
   </div>
   <div class="user-message">
-    <div class="user-name-time">rbunch <span>1:25 pm</span></div>
-    <div class="message-text">I went running today.</div>
+    <div class="user-name-time">${
+      msg.username
+    } <span>${date.toLocaleDateString()}   ${date.toLocaleTimeString()}</span></div>
+    <div class="message-text">${msg.text}</div>
   </div>
 </li>`;
 

@@ -12,6 +12,7 @@ socket.on("nsList", (nsData) => {
     elem.addEventListener("click", (e) => {
       let nsEndppoint = elem.getAttribute("ns");
       console.log(nsEndppoint);
+      joinNS(nsEndppoint);
     });
   });
 

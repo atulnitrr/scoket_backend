@@ -1,4 +1,10 @@
 function joinNS(endpoint) {
+  if (nsSocket) {
+    nsSocket.close();
+    document
+      .querySelector(".message-form")
+      .removeEventListener("submit", formSubmission);
+  }
   nsSocket = io(`http://localhost:3033${endpoint}`);
 
   nsSocket.on("nsRoomLoad", (nsRooms) => {
@@ -15,6 +21,7 @@ function joinNS(endpoint) {
     Array.from(roomNodes).forEach((elem) => {
       elem.addEventListener("click", (e) => {
         console.log(e.target.innerText);
+        joinRoom(e.target.innerText);
       });
     });
 
@@ -34,15 +41,17 @@ function joinNS(endpoint) {
 
   document
     .querySelector(".message-form")
-    .addEventListener("submit", (event) => {
-      event.preventDefault();
-      const msgNode = document.querySelector("#user-message");
-      const newMessage = msgNode.value;
-      nsSocket.emit("newMsgToServer", { text: newMessage });
-      msgNode.value = "";
-    });
+    .addEventListener("submit", formSubmission);
 
   //
+}
+
+function formSubmission(event) {
+  event.preventDefault();
+  const msgNode = document.querySelector("#user-message");
+  const newMessage = msgNode.value;
+  nsSocket.emit("newMsgToServer", { text: newMessage });
+  msgNode.value = "";
 }
 
 function buildHtml(msg) {

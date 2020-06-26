@@ -26,4 +26,22 @@ function joinRoom(roomname) {
 
     document.querySelector(".curr-room-text").innerText = `${roomname}`;
   });
+
+  //
+  let searchBox = document.querySelector("#search-box");
+  searchBox.addEventListener("input", (e) => {
+    let messages = Array.from(document.getElementsByClassName("message-text"));
+    console.log(messages);
+    messages.forEach((msg) => {
+      if (
+        msg.innerText.toLowerCase().indexOf(e.target.value.toLowerCase()) === -1
+      ) {
+        console.log("not doune ");
+        msg.style.display = "none";
+      } else {
+        console.log("found");
+        msg.style.display = "block";
+      }
+    });
+  });
 }

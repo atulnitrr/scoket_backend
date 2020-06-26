@@ -26,9 +26,16 @@ io.on("connection", (socket) => {
 namespaces.forEach((namespace) => {
   io.of(namespace.endpoint).on("connection", (nsSocket) => {
     console.log(`${nsSocket.id} has joined ${namespace.endpoint}`);
-    nsSocket.emit("nsRoomLoad", namespaces[0].rooms);
+    nsSocket.emit("nsRoomLoad", namespace.rooms);
     // JOIN ROOM
     nsSocket.on("joinRoom", (roomToJoin, callBack) => {
+      let allRooms = Object.keys(nsSocket.rooms);
+      if (allRooms.length > 1) {
+        const roomToleave = allRooms[1];
+        nsSocket.leave(roomToleave);
+        updateUserCount(namespace, roomToleave);
+      }
+
       nsSocket.join(roomToJoin);
       // io.of("/wiki")
       //   .in(roomToJoin)
@@ -36,15 +43,14 @@ namespaces.forEach((namespace) => {
       //     callBack(clients.length);
       //   });
       //
-      const nsRoom = namespaces[0].rooms.find((room) => {
+      const nsRoom = namespace.rooms.find((room) => {
         return room.roomTitle === roomToJoin;
       });
-      nsSocket.emit("histroyCatchUp", nsRoom.history);
-      io.of("/wiki")
-        .to(roomToJoin)
-        .clients((error, clients) => {
-          io.of("/wiki").to(roomToJoin).emit("updateMembers", clients.length);
-        });
+      if (nsRoom !== undefined) {
+        nsSocket.emit("histroyCatchUp", nsRoom.history ? nsRoom.history : []);
+        updateUserCount(namespace, roomToJoin);
+      }
+
       //
     });
     //
@@ -58,14 +64,24 @@ namespaces.forEach((namespace) => {
       };
       const roomTitles = Object.keys(nsSocket.rooms);
       const roomTitle = roomTitles[1];
-      const nsRoom = namespaces[0].rooms.find((room) => {
+      const nsRoom = namespace.rooms.find((room) => {
         return room.roomTitle === roomTitle;
       });
 
       console.log(nsRoom);
       nsRoom.addMessage(fullMsg);
-      io.of("/wiki").to(roomTitle).emit("messageToClients", fullMsg);
+      io.of(namespace.endpoint).to(roomTitle).emit("messageToClients", fullMsg);
     });
     //
   });
 });
+
+function updateUserCount(namespace, roomToJoin) {
+  io.of(namespace.endpoint)
+    .to(roomToJoin)
+    .clients((error, clients) => {
+      io.of(namespace.endpoint)
+        .to(roomToJoin)
+        .emit("updateMembers", clients.length);
+    });
+}

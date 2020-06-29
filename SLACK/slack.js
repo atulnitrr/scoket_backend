@@ -12,6 +12,7 @@ const expressServer = expressApp.listen("3033", () => {
 const io = socketio(expressServer);
 
 io.on("connection", (socket) => {
+  console.log(socket.handshake);
   let nsData = namespaces.map((ns) => {
     return {
       img: ns.img,
@@ -25,6 +26,7 @@ io.on("connection", (socket) => {
 
 namespaces.forEach((namespace) => {
   io.of(namespace.endpoint).on("connection", (nsSocket) => {
+    const username = nsSocket.handshake.query.username;
     console.log(`${nsSocket.id} has joined ${namespace.endpoint}`);
     nsSocket.emit("nsRoomLoad", namespace.rooms);
     // JOIN ROOM
@@ -59,11 +61,12 @@ namespaces.forEach((namespace) => {
       const fullMsg = {
         text: msg.text,
         time: Date.now(),
-        username: "Atul",
+        username: username,
         avatar: "https://via.placeholder.com/30",
       };
       const roomTitles = Object.keys(nsSocket.rooms);
       const roomTitle = roomTitles[1];
+      console.log(roomTitle);
       const nsRoom = namespace.rooms.find((room) => {
         return room.roomTitle === roomTitle;
       });

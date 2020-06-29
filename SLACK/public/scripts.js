@@ -1,4 +1,10 @@
-const socket = io("http://localhost:3033");
+// const socket = io("http://localhost:3033");
+const username = prompt("what is your user name");
+const socket = io("http://localhost:3033", {
+  query: {
+    username,
+  },
+});
 let nsSocket = "";
 
 socket.on("nsList", (nsData) => {
